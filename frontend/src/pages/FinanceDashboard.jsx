@@ -11,11 +11,14 @@ export default function FinanceDashboard() {
   const [loading, setLoading] = useState(true);
   const [showContribution, setShowContribution] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
+  const [showExpenseEdit, setShowExpenseEdit] = useState(false);
   const [contForm, setContForm] = useState({ playerId: '', amount: '' });
   const [playerContribution, setPlayerContribution] = useState(null); // { entries: [...] }
   const [editingEntryId, setEditingEntryId] = useState(null);
   const [editingAmount, setEditingAmount] = useState('');
   const [expForm, setExpForm] = useState({ amount: '', description: '', category: 'other' });
+  const [editingExpenseId, setEditingExpenseId] = useState(null);
+  const [editingExpenseForm, setEditingExpenseForm] = useState({ amount: '', description: '' });
   const [players, setPlayers] = useState([]);
   const [saving, setSaving] = useState(false);
 
@@ -166,6 +169,59 @@ export default function FinanceDashboard() {
     }
   };
 
+  const openEditExpense = (expense) => {
+    if (!expense?._id) return;
+    setEditingExpenseId(expense._id);
+    setEditingExpenseForm({
+      amount: String(expense.amount ?? ''),
+      description: expense.description ?? ''
+    });
+    setShowExpenseEdit(true);
+  };
+
+  const handleUpdateExpense = async (e) => {
+    e.preventDefault();
+    if (!isAdmin || !editingExpenseId) return;
+    const amountNum = +editingExpenseForm.amount;
+    const description = (editingExpenseForm.description || '').trim();
+    if (!amountNum || amountNum < 1 || description.length < 3) {
+      toast.error('Enter valid amount and description');
+      return;
+    }
+    setSaving(true);
+    try {
+      await api.put(`/finance/expenses/${editingExpenseId}`, {
+        amount: amountNum,
+        description
+      });
+      toast.success('Expense updated');
+      setShowExpenseEdit(false);
+      setEditingExpenseId(null);
+      setEditingExpenseForm({ amount: '', description: '' });
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update expense');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteExpense = async (expenseId) => {
+    if (!isAdmin || !expenseId) return;
+    const ok = window.confirm('Delete this expense?');
+    if (!ok) return;
+    setSaving(true);
+    try {
+      await api.delete(`/finance/expenses/${expenseId}`);
+      toast.success('Expense deleted');
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete expense');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) return <div className="flex justify-center py-12"><div className="spinner" /></div>;
 
   return (
@@ -200,7 +256,7 @@ export default function FinanceDashboard() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-gray-400 border-b border-gray-700">
+              <tr className="text-left text-gray-300 border-b border-gray-700/60">
                 <th>Player</th>
                 <th className="text-right">Total (₹)</th>
                 {isAdmin && <th className="text-right">Action</th>}
@@ -208,10 +264,10 @@ export default function FinanceDashboard() {
             </thead>
             <tbody>
               {allPlayerContributionRows.map((row) => (
-                <tr key={row.playerId} className="border-b border-gray-700/50">
+                <tr key={row.playerId} className="border-b border-gray-700/50 hover:bg-white/5 transition">
                   <td className="py-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary-700 flex items-center justify-center text-amber-400 font-bold">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-yellow-400/20 to-orange-500/20 border border-white/10 flex items-center justify-center text-amber-300 font-bold shadow-sm">
                         {row.player?.name?.slice(0, 2)?.toUpperCase() || '—'}
                       </div>
                       <div className="min-w-0">
@@ -220,12 +276,12 @@ export default function FinanceDashboard() {
                       </div>
                     </div>
                   </td>
-                  <td className="text-right font-mono text-amber-400">₹{row.totalAmount}</td>
+                  <td className="text-right font-mono text-amber-300">₹{row.totalAmount}</td>
                   {isAdmin && (
                     <td className="text-right">
                       <button
                         type="button"
-                        className="btn btn-ghost btn-sm"
+                        className="btn btn-ghost btn-sm px-3"
                         onClick={() => {
                           openContributionForPlayer(row.playerId);
                         }}
@@ -245,9 +301,36 @@ export default function FinanceDashboard() {
         <h3 className="text-lg font-semibold mb-4">Expenses</h3>
         <div className="space-y-2">
           {(expenses || []).map(e => (
-            <div key={e._id} className="flex justify-between items-center py-2 border-b border-gray-700/50">
-              <div><span className="font-medium">{e.description}</span> <span className="text-gray-500 text-xs">{e.category}</span></div>
-              <span className="font-mono text-red-400">₹{e.amount}</span>
+            <div
+              key={e._id}
+              className="flex justify-between items-center py-3 px-3 rounded-xl border border-white/10 bg-white/5"
+            >
+              <div className="min-w-0">
+                <div className="font-medium truncate">{e.description}</div>
+                <div className="text-gray-400 text-xs">{e.category}</div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="font-mono text-red-300 shrink-0">₹{e.amount}</span>
+                {isAdmin && (
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="text-xs sm:text-sm px-3 py-1 rounded-md bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
+                      onClick={() => openEditExpense(e)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="text-xs sm:text-sm px-3 py-1 rounded-md bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
+                      onClick={() => handleDeleteExpense(e._id)}
+                      disabled={saving}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -255,7 +338,7 @@ export default function FinanceDashboard() {
 
       {showContribution && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md">
+          <div className="card w-full max-w-md bg-white/5 backdrop-blur-md border border-white/10 shadow-md">
             <h3 className="text-lg font-semibold mb-4">Add contribution</h3>
             <form onSubmit={handleAddContribution} className="space-y-4">
               <div>
@@ -316,7 +399,7 @@ export default function FinanceDashboard() {
                     .map((entry) => {
                       const isEditing = String(entry._id) === String(editingEntryId);
                       return (
-                        <div key={entry._id} className="rounded-lg border border-gray-700/50 p-3">
+                        <div key={entry._id} className="rounded-xl bg-white/5 backdrop-blur-md border border-white/10 p-3 shadow-sm">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div className="text-sm text-gray-300">
                               ₹{entry.amount}{' '}
@@ -385,7 +468,7 @@ export default function FinanceDashboard() {
 
       {showExpense && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md">
+          <div className="card w-full max-w-md bg-white/5 backdrop-blur-md border border-white/10 shadow-md">
             <h3 className="text-lg font-semibold mb-4">Add expense</h3>
             <form onSubmit={handleAddExpense} className="space-y-4">
               <div>
@@ -405,6 +488,54 @@ export default function FinanceDashboard() {
               <div className="flex gap-2">
                 <button type="button" className="btn btn-ghost" onClick={() => setShowExpense(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Add'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showExpenseEdit && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="card w-full max-w-md bg-white/5 backdrop-blur-md border border-white/10 shadow-md">
+            <h3 className="text-lg font-semibold mb-4">Edit expense</h3>
+            <form onSubmit={handleUpdateExpense} className="space-y-4">
+              <div>
+                <label className="form-label">Amount (₹)</label>
+                <input
+                  type="number"
+                  min="1"
+                  className="form-input"
+                  value={editingExpenseForm.amount}
+                  onChange={(ev) => setEditingExpenseForm(f => ({ ...f, amount: ev.target.value }))}
+                  required
+                />
+              </div>
+              <div>
+                <label className="form-label">Description</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={editingExpenseForm.description}
+                  onChange={(ev) => setEditingExpenseForm(f => ({ ...f, description: ev.target.value }))}
+                  placeholder="e.g. Ground rent"
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => {
+                    setShowExpenseEdit(false);
+                    setEditingExpenseId(null);
+                    setEditingExpenseForm({ amount: '', description: '' });
+                  }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
               </div>
             </form>
           </div>
