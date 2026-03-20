@@ -109,6 +109,28 @@ Also create `netlify.toml` in this repo so Netlify:
 - builds `frontend/`
 - uses SPA routing correctly
 
+### Backend (Vercel — alternative to Render)
+
+Express **cannot** use `app.listen()` on Vercel (serverless). This repo includes:
+
+- `backend/api/index.js` — serverless handler (`serverless-http`)
+- `backend/vercel.json` — rewrites all routes to that function
+
+**Vercel project settings**
+
+1. **Root Directory:** `backend` (if the repo has `frontend/` + `backend/`).
+2. **Environment variables** (required):
+   - `MONGODB_URI` — your Atlas connection string (include database name if you use one).
+   - `JWT_SECRET` — any long random string.
+   - `CORS_ORIGIN` — your frontend origin(s), comma-separated (e.g. `https://your-app.netlify.app` or your Vercel frontend URL). If unset, the API allows all origins.
+3. Redeploy after changing env vars.
+
+**Frontend:** set `VITE_API_BASE_URL` to your Vercel API base **including `/api`**, e.g. `https://your-backend.vercel.app/api`.
+
+**Health check:** open `https://your-backend.vercel.app/api/health` — should return JSON `{ "status": "OK", ... }`.
+
+**Note:** `npm warn deprecated multer@1.x` is only a **warning** during install; it does not cause the 500. Upgrading to Multer 2.x is optional. **File uploads** saved under `backend/uploads/` do **not** persist on Vercel’s filesystem — use S3/Cloudinary etc. for production images.
+
 ### Local production test
 - Backend: set `MONGODB_URI`, `JWT_SECRET`, `CORS_ORIGIN` and run `npm start` in `backend/`.
 - Frontend: set `VITE_API_BASE_URL` and run `npm run build && npm run preview` in `frontend/`.

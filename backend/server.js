@@ -15,6 +15,9 @@ import dashboardRoutes from './routes/dashboard.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+// Behind Vercel / proxies (needed for secure cookies / correct client IP if you add them later)
+app.set('trust proxy', 1);
+
 app.use(cors({
   // Allow requests from your frontend (Netlify/Render) when deployed.
   // Set CORS_ORIGIN as a comma-separated list, e.g.:
@@ -63,8 +66,15 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-}).catch(() => process.exit(1));
+// Vercel = serverless: no app.listen(); the handler is in api/index.js
+const isVercel = process.env.VERCEL === '1';
+
+if (!isVercel) {
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    })
+    .catch(() => process.exit(1));
+}
 
 export default app;
