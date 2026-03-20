@@ -4,6 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
+import { uploadsRoot } from './config/uploadPaths.js';
 
 import authRoutes from './routes/auth.js';
 import teamRoutes from './routes/teams.js';
@@ -63,7 +64,8 @@ if (isVercel) {
   });
 }
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Local: ./uploads — Vercel: /tmp/... (project dir is not writable)
+app.use('/uploads', express.static(uploadsRoot));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/teams', teamRoutes);

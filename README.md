@@ -126,7 +126,7 @@ Also create `netlify.toml` in this repo so Netlify:
 
 **Health check:** open `https://your-backend.vercel.app/api/health` — should return JSON `{ "status": "OK", ... }`.
 
-**Note:** **File uploads** saved under `backend/uploads/` do **not** persist on Vercel’s filesystem — use S3/Cloudinary etc. for production images.
+**Note:** On Vercel, the **deployed project folder is read-only**. Creating `backend/uploads` at startup **crashed** the serverless function; uploads now use **`/tmp`** on Vercel and static files are served from there. **`/tmp` is ephemeral** (images can disappear between cold starts). For production, use **S3 / Cloudinary** etc.
 
 ### Local production test
 - Backend: set `MONGODB_URI`, `JWT_SECRET`, `CORS_ORIGIN` and run `npm start` in `backend/`.

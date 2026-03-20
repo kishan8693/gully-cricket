@@ -1,18 +1,23 @@
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { userUploadDir, uploadsRoot } from '../config/uploadPaths.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+function ensureDirs() {
+  try {
+    [uploadsRoot, userUploadDir].forEach((dir) => {
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    });
+  } catch (e) {
+    console.error('upload dirs:', e.message);
+    throw e;
+  }
+}
 
-const uploadDir = path.join(__dirname, '../uploads');
-const userDir = path.join(uploadDir, 'users');
-[uploadDir, userDir].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
+ensureDirs();
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, userDir),
+  destination: (req, file, cb) => cb(null, userUploadDir),
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname) || '.jpg';
     cb(null, `user-${Date.now()}${ext}`);
