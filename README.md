@@ -78,6 +78,41 @@ npm run dev     # runs on http://localhost:5173
 - **Login:** `admin` / `admin123` (full access)
 - Or **Sign up** as a new user (read-only + profile edit)
 
+## Deployment (MongoDB Atlas + Render + Netlify)
+
+### 1) Create MongoDB Atlas database
+1. Open your Atlas dashboard.
+2. Create a **Cluster** (choose your preferred region).
+3. In **Database**, create/select a database name (example: `gullyCricket`).
+4. Create a **Database User** with read/write permissions for that database.
+5. Copy the **Connection String** in the format shown by Atlas. Replace:
+   - `<username>`, `<password>`, `<cluster>`, and `<db>`
+
+Your backend uses `process.env.MONGODB_URI`.
+
+### 2) Backend (Render)
+In Render, set environment variables for your service:
+- `NODE_ENV=production`
+- `PORT=5000` (or use Render-provided `PORT`)
+- `MONGODB_URI=<your-atlas-connection-string>`
+- `JWT_SECRET=<your-secret>`
+- `CORS_ORIGIN=<your-netlify-site-url>` (example: `https://your-site.netlify.app`)
+
+Make sure Render runs `cd backend && npm install && npm start`.
+
+### 3) Frontend (Netlify)
+Set environment variable:
+- `VITE_API_BASE_URL=<your-render-backend-base-url>/api`
+  - Example: `https://your-backend.onrender.com/api`
+
+Also create `netlify.toml` in this repo so Netlify:
+- builds `frontend/`
+- uses SPA routing correctly
+
+### Local production test
+- Backend: set `MONGODB_URI`, `JWT_SECRET`, `CORS_ORIGIN` and run `npm start` in `backend/`.
+- Frontend: set `VITE_API_BASE_URL` and run `npm run build && npm run preview` in `frontend/`.
+
 ## API (overview)
 
 - `POST /api/auth/register` — Signup

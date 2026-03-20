@@ -16,7 +16,24 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? false : 'http://localhost:5173',
+  // Allow requests from your frontend (Netlify/Render) when deployed.
+  // Set CORS_ORIGIN as a comma-separated list, e.g.:
+  //   https://your-netlify-site.com
+  // If not set, default to allowing all origins.
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const env = process.env.CORS_ORIGIN || '';
+    const allowed = env
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    // If no allowed origins provided, allow all.
+    if (!allowed.length) return callback(null, true);
+
+    if (allowed.includes(origin)) return callback(null, true);
+    return callback(null, false);
+  },
   credentials: true
 }));
 app.use(express.json());

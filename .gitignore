@@ -15,6 +15,10 @@
 logs/
 *.log
 
+# Uploads (sample/user uploads)
+backend/uploads/
+backend/uploads/**
+
 # Editors
 .vscode/
 .idea/

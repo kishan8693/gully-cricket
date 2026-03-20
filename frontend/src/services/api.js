@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  // In production, set VITE_API_BASE_URL (e.g. https://your-backend.onrender.com/api)
+  // so that existing calls like api.get('/teams') become:
+  //   <VITE_API_BASE_URL>/teams
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   headers: { 'Content-Type': 'application/json' }
 });
 
