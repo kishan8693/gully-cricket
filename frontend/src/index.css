@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-primary-900 text-gray-100 font-sans antialiased min-h-screen;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition inline-flex items-center justify-center gap-2;
+  }
+  .btn-sm {
+    @apply px-3 py-1 text-sm rounded-lg;
+  }
+  .btn-primary { @apply bg-amber-500 text-primary-900 hover:bg-amber-400; }
+  .btn-secondary { @apply bg-primary-700 text-gray-200 hover:bg-primary-600 border border-gray-600; }
+  .btn-ghost { @apply bg-transparent text-gray-300 hover:bg-white/5; }
+  .btn-danger { @apply bg-red-600 text-white hover:bg-red-500; }
+  .btn-success { @apply bg-emerald-600 text-white hover:bg-emerald-500; }
+  .card { @apply bg-primary-800/80 border border-gray-700 rounded-xl p-5; }
+  .form-input {
+    @apply w-full px-3 py-2 rounded-lg bg-primary-900 border border-gray-600 text-gray-100 placeholder-gray-500 focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500;
+  }
+  .form-label { @apply block text-sm font-medium text-gray-400 mb-1; }
+  .badge { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium; }
+  .badge-gold { @apply bg-amber-500/20 text-amber-400; }
+  .badge-green { @apply bg-emerald-500/20 text-emerald-400; }
+  .badge-red { @apply bg-red-500/20 text-red-400; }
+  .badge-muted { @apply bg-gray-600/50 text-gray-400; }
+}
+
+.spinner {
+  @apply w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin;
+}
+
+@keyframes winRocketFly {
+  0% { transform: translateY(8px) rotate(-12deg) scale(0.8); opacity: 0; }
+  25% { opacity: 1; }
+  55% { transform: translateY(-10px) rotate(8deg) scale(1.12); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes winFirecrackerPop {
+  0% { transform: scale(0.6) rotate(-10deg); opacity: 0; }
+  20% { opacity: 1; }
+  55% { transform: scale(1.25) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Match win animation (rocket + firecracker) */
+.match-win-rocket {
+  display: inline-block;
+  animation: winRocketFly 900ms ease-out both;
+}
+
+.match-win-firecracker {
+  display: inline-block;
+  animation: winFirecrackerPop 900ms ease-out both;
+}
+
+@keyframes tossCoinFlip {
+  0% { transform: rotateY(0deg) rotateZ(0deg) scale(1); }
+  25% { transform: rotateY(110deg) rotateZ(-8deg) scale(1.03); }
+  50% { transform: rotateY(180deg) rotateZ(0deg) scale(1.08); }
+  75% { transform: rotateY(250deg) rotateZ(8deg) scale(1.03); }
+  100% { transform: rotateY(360deg) rotateZ(0deg) scale(1); }
+}
+
+.toss-coin-anim {
+  animation: tossCoinFlip 1.6s ease-in-out both;
+  transform-style: preserve-3d;
+}

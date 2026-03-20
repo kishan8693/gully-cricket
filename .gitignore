@@ -1,0 +1,24 @@
+# Node
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+**/.vite/
+
+# Env / secrets
+.env
+**/.env
+**/.env.*
+
+# Logs
+logs/
+*.log
+
+# Editors
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
