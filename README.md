@@ -111,10 +111,7 @@ Also create `netlify.toml` in this repo so Netlify:
 
 ### Backend (Vercel — alternative to Render)
 
-Express **cannot** use `app.listen()` on Vercel (serverless). This repo includes:
-
-- `backend/api/index.js` — serverless handler (`serverless-http`)
-- `backend/vercel.json` — rewrites all routes to that function
+[Vercel runs Express natively](https://vercel.com/docs/frameworks/backend/express): **`backend/server.js`** default-exports the app and skips `app.listen()` when `VERCEL` is set. MongoDB is connected via middleware on Vercel (no extra `api/` file or `serverless-http`).
 
 **Vercel project settings**
 
@@ -129,7 +126,7 @@ Express **cannot** use `app.listen()` on Vercel (serverless). This repo includes
 
 **Health check:** open `https://your-backend.vercel.app/api/health` — should return JSON `{ "status": "OK", ... }`.
 
-**Note:** `npm warn deprecated multer@1.x` is only a **warning** during install; it does not cause the 500. Upgrading to Multer 2.x is optional. **File uploads** saved under `backend/uploads/` do **not** persist on Vercel’s filesystem — use S3/Cloudinary etc. for production images.
+**Note:** **File uploads** saved under `backend/uploads/` do **not** persist on Vercel’s filesystem — use S3/Cloudinary etc. for production images.
 
 ### Local production test
 - Backend: set `MONGODB_URI`, `JWT_SECRET`, `CORS_ORIGIN` and run `npm start` in `backend/`.

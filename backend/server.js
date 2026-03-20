@@ -18,6 +18,9 @@ const app = express();
 // Behind Vercel / proxies (needed for secure cookies / correct client IP if you add them later)
 app.set('trust proxy', 1);
 
+/** Vercel runs Express natively (no app.listen). Connect Mongo before each request (cached in db.js). */
+const isVercel = Boolean(process.env.VERCEL);
+
 app.use(cors({
   // Allow requests from your frontend (Netlify/Render) when deployed.
   // Set CORS_ORIGIN as a comma-separated list, e.g.:
@@ -42,6 +45,24 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+if (isVercel) {
+  app.use(async (req, res, next) => {
+    try {
+      await connectDB();
+      next();
+    } catch (err) {
+      console.error('MongoDB:', err);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message:
+            'Database connection failed. Set MONGODB_URI in Vercel → Environment Variables.'
+        });
+      }
+    }
+  });
+}
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);
@@ -55,6 +76,15 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Night Cricket API' });
 });
 
+// Friendly root when opening the Vercel URL in a browser
+app.get('/', (req, res) => {
+  res.json({
+    ok: true,
+    message: 'Night Cricket API',
+    health: '/api/health'
+  });
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, message: 'Internal Server Error', error: err.message });
@@ -66,9 +96,7 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
-// Vercel = serverless: no app.listen(); the handler is in api/index.js
-const isVercel = process.env.VERCEL === '1';
-
+// Local / Render: start HTTP server. Vercel uses default export only (see Vercel Express docs).
 if (!isVercel) {
   connectDB()
     .then(() => {
