@@ -4,7 +4,7 @@ const api = axios.create({
   // In production, set VITE_API_BASE_URL (e.g. https://your-backend.onrender.com/api)
   // so that existing calls like api.get('/teams') become:
   //   <VITE_API_BASE_URL>/teams
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: "https://gully-cricket-q377.vercel.app",
   headers: { 'Content-Type': 'application/json' }
 });
 
