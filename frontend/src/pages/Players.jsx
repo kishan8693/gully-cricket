@@ -124,15 +124,15 @@ export default function Players() {
   if (loading) return <div className="flex justify-center py-12"><div className="spinner" /></div>;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-100">Players</h2>
+    <div className="w-full max-w-full overflow-x-hidden space-y-4 sm:space-y-6 px-3 sm:px-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        <h2 className="text-lg sm:text-2xl font-bold text-gray-100 truncate">Players</h2>
         {isAdmin && (
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>+ Add Player</button>
+          <button type="button" className="btn btn-primary w-full sm:w-auto rounded-lg px-4 py-2 shrink-0" onClick={() => setShowModal(true)}>+ Add Player</button>
         )}
       </div>
-      <div className="card">
-        <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="card rounded-xl shadow-md">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
           <div className="flex-1 min-w-[220px]">
             <label className="form-label mb-2">View</label>
             <select
@@ -146,12 +146,12 @@ export default function Players() {
               ))}
             </select>
           </div>
-          <div className="text-sm text-gray-400">
+          <div className="text-xs sm:text-sm text-gray-400">
             Showing <span className="text-gray-200 font-semibold">{players.length}</span> player(s)
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {players.map(p => (
           <motion.div
             key={p._id}
@@ -163,18 +163,18 @@ export default function Players() {
             }}
             whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.18 }}
-            className="w-full min-h-[150px] sm:min-h-[170px] p-4 sm:p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-md hover:shadow-xl transition duration-300 hover:scale-[1.01] cursor-pointer flex items-center justify-between gap-4"
+            className="w-full min-h-0 sm:min-h-[170px] p-4 sm:p-5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 shadow-md hover:shadow-xl transition duration-300 active:scale-[0.99] sm:hover:scale-[1.01] cursor-pointer flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-0"
           >
             <Link
               to={`/players/${p._id}`}
-              className="flex items-center justify-between gap-4 flex-1 min-w-0"
+              className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between flex-1 min-w-0 w-full"
               onClick={(e) => {
                 // Prevent navigation; we open the modal instead.
                 e.preventDefault();
               }}
             >
-              <div className="flex items-center gap-4 min-w-0">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center bg-gradient-to-br from-yellow-400 to-orange-500 text-black font-bold text-sm sm:text-base shadow-md ring-2 ring-white/10 overflow-hidden">
+              <div className="flex items-center gap-3 min-w-0 w-full">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-full flex items-center justify-center bg-gradient-to-br from-yellow-400 to-orange-500 text-black font-bold text-xs sm:text-base shadow-md ring-2 ring-white/10 overflow-hidden">
                   {p.profileImage ? (
                     <img
                       src={p.profileImage.startsWith('http') ? p.profileImage : (import.meta.env.DEV ? 'http://localhost:5000' : '') + p.profileImage}
@@ -186,9 +186,9 @@ export default function Players() {
                   )}
                 </div>
 
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0 flex-1 overflow-hidden">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <div className="text-base sm:text-lg font-semibold text-white truncate break-words">{p.name}</div>
+                    <div className="text-sm sm:text-lg font-bold text-white truncate break-words max-w-full">{p.name}</div>
                     {(p?.isCaptain === true || p?.captain === true) && (
                       <span className="text-xs px-2 py-1 rounded bg-yellow-500 text-black">C</span>
                     )}
@@ -196,7 +196,7 @@ export default function Players() {
                       <span className="text-xs px-2 py-1 rounded bg-blue-500 text-white">VC</span>
                     )}
                   </div>
-                  <div className="text-sm text-gray-400 break-words">
+                  <div className="text-xs sm:text-sm text-gray-400 break-words">
                     {p.teamId?.shortName} · {p.role}
                   </div>
                 </div>
@@ -207,7 +207,7 @@ export default function Players() {
                 const matchesPlayed = derived ? derived.matchesPlayed : '—';
                 const wickets = derived ? derived.wickets : '—';
                 return (
-                  <div className="grid grid-cols-3 gap-3 text-center min-w-[165px]">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center w-full sm:w-auto sm:min-w-[160px] border-t border-white/10 pt-3 sm:border-t-0 sm:pt-0">
                     <div>
                       <div className="text-xs text-gray-400">Runs</div>
                       <div className="text-sm font-semibold text-yellow-400">{p.totalRuns ?? 0}</div>
@@ -227,7 +227,7 @@ export default function Players() {
             {isAdmin && (
               <button
                 type="button"
-                className="text-xs sm:text-sm px-3 py-1 rounded-md bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
+                className="text-xs sm:text-sm px-4 py-2 rounded-lg w-full sm:w-auto bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition shrink-0"
                 onClick={(e) => {
                   e.stopPropagation();
                   openEdit(p);
@@ -243,7 +243,7 @@ export default function Players() {
       <AnimatePresence>
         {playerModalOpen && (
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
             onClick={closePlayerModal}
           >
             <motion.div
@@ -251,29 +251,29 @@ export default function Players() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96 }}
               transition={{ duration: 0.18 }}
-              className="bg-primary-900 rounded-2xl p-6 w-[90%] max-w-md border border-white/10 shadow-xl"
+              className="bg-primary-900 rounded-xl p-4 sm:p-6 w-[90%] max-w-md max-h-[90vh] overflow-y-auto my-auto border border-white/10 shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="grid grid-cols-[auto,1fr] gap-4 flex-1 items-start">
+              <div className="flex items-start justify-between gap-3">
+                <div className="grid grid-cols-[auto,1fr] gap-3 sm:gap-4 flex-1 items-start min-w-0">
                   <div className="p-[2px] rounded-full bg-gradient-to-r from-primary-600 to-amber-500 shadow-md ring-2 ring-white/10">
                     {selectedPlayer?.profileImage ? (
                       <img
                         src={selectedPlayer.profileImage.startsWith('http') ? selectedPlayer.profileImage : (import.meta.env.DEV ? 'http://localhost:5000' : '') + selectedPlayer.profileImage}
                         alt=""
-                        className="w-24 h-24 rounded-full object-cover"
+                        className="w-16 h-16 sm:w-24 sm:h-24 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-full bg-primary-700 flex items-center justify-center text-2xl font-bold text-amber-400">
+                      <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-primary-700 flex items-center justify-center text-lg sm:text-2xl font-bold text-amber-400">
                         {(selectedPlayer?.name || '').slice(0, 2).toUpperCase()}
                       </div>
                     )}
                   </div>
-                  <div className="min-w-0">
-                    <div className="text-base font-semibold text-gray-100 truncate break-words">
+                  <div className="min-w-0 overflow-hidden">
+                    <div className="text-sm sm:text-base font-semibold text-gray-100 truncate break-words">
                       {selectedPlayer?.name || 'Loading...'}
                     </div>
-                    <div className="text-sm text-gray-400 break-words">
+                    <div className="text-xs sm:text-sm text-gray-400 break-words">
                       {(selectedPlayer?.teamId?.shortName || selectedPlayer?.teamId?.name || '-') + ' · ' + (selectedPlayer?.role || '')}
                     </div>
                   </div>
@@ -295,7 +295,7 @@ export default function Players() {
                 </div>
               ) : (
                 <>
-                  <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+                  <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3 text-center text-xs sm:text-sm">
                     <div>
                       <div className="text-[11px] text-gray-400">Runs</div>
                       <div className="text-sm font-bold text-amber-400">{selectedPlayer?.totalRuns ?? 0}</div>
@@ -322,13 +322,13 @@ export default function Players() {
                     </div>
                   </div>
 
-                  <div className="mt-5">
-                    <h3 className="text-sm font-semibold text-gray-200 mb-3">Match-wise performance</h3>
+                  <div className="mt-4 sm:mt-5">
+                    <h3 className="text-xs sm:text-sm font-semibold text-gray-200 mb-2 sm:mb-3">Match-wise performance</h3>
                     {(selectedPlayer?.performances || []).length === 0 ? (
                       <div className="text-gray-500 text-sm">No matches yet</div>
                     ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full min-w-[820px] text-sm">
+                      <div className="overflow-x-auto -mx-1 px-1 max-w-full">
+                        <table className="w-full min-w-[820px] text-xs sm:text-sm">
                           <thead>
                             <tr className="text-left text-gray-400 border-b border-gray-700">
                               <th>Match</th>
@@ -380,9 +380,9 @@ export default function Players() {
         )}
       </AnimatePresence>
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Add Player</h3>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="card w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl shadow-md my-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Add Player</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="form-label">Name</label>
@@ -405,9 +405,9 @@ export default function Players() {
                 <label className="form-label">Jersey # (optional)</label>
                 <input type="number" min="1" max="99" className="form-input" value={form.jerseyNumber} onChange={e => setForm(f => ({ ...f, jerseyNumber: e.target.value }))} />
               </div>
-              <div className="flex gap-2">
-                <button type="button" className="btn btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Add'}</button>
+              <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-2">
+                <button type="button" className="btn btn-ghost w-full sm:w-auto rounded-lg px-4 py-2" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary w-full sm:w-auto rounded-lg px-4 py-2" disabled={saving}>{saving ? 'Saving...' : 'Add'}</button>
               </div>
             </form>
           </div>
@@ -415,9 +415,9 @@ export default function Players() {
       )}
 
       {showEditModal && editingPlayer && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Edit Player</h3>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="card w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl shadow-md my-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Edit Player</h3>
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -497,11 +497,11 @@ export default function Players() {
                   onChange={(e) => setEditProfileImage(e.target.files?.[0] || null)}
                 />
               </div>
-              <div className="flex gap-2">
-                <button type="button" className="btn btn-ghost" onClick={() => { setShowEditModal(false); setEditingPlayer(null); setEditProfileImage(null); }}>
+              <div className="flex flex-col-reverse sm:flex-row gap-2">
+                <button type="button" className="btn btn-ghost w-full sm:w-auto rounded-lg px-4 py-2" onClick={() => { setShowEditModal(false); setEditingPlayer(null); setEditProfileImage(null); }}>
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
+                <button type="submit" className="btn btn-primary w-full sm:w-auto rounded-lg px-4 py-2" disabled={saving}>
                   {saving ? 'Saving...' : 'Save'}
                 </button>
               </div>

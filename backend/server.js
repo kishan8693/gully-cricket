@@ -23,19 +23,21 @@ app.set('trust proxy', 1);
 const isVercel = Boolean(process.env.VERCEL);
 
 app.use(cors({
-  // Allow requests from your frontend (Netlify/Render) when deployed.
-  // Set CORS_ORIGIN as a comma-separated list, e.g.:
-  //   https://your-netlify-site.com
-  // If not set, default to allowing all origins.
+  // Allow requests from your frontend (Netlify/Vercel) when deployed.
+  // Set CORS_ORIGIN as a comma-separated list. If empty, allow all origins.
+  // Always allow localhost / 127.0.0.1 (any port) so direct http://localhost:5000/api
+  // from a dev server on another port still works when CORS_ORIGIN is production-only.
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
+    const isLocalDev = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+    if (isLocalDev) return callback(null, true);
+
     const env = process.env.CORS_ORIGIN || '';
     const allowed = env
       .split(',')
       .map(s => s.trim())
       .filter(Boolean);
 
-    // If no allowed origins provided, allow all.
     if (!allowed.length) return callback(null, true);
 
     if (allowed.includes(origin)) return callback(null, true);

@@ -74,45 +74,46 @@ export default function Teams() {
   if (loading) return <div className="flex justify-center py-12"><div className="spinner" /></div>;
 
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between items-center flex-wrap gap-3">
-        <h2 className="text-2xl font-bold text-gray-100 truncate">Teams</h2>
+    <div className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 overflow-x-hidden">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
+        <h2 className="text-lg sm:text-2xl font-bold text-gray-100 truncate">Teams</h2>
         {isAdmin && (
           <button
-            className="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-black font-medium transition"
+            type="button"
+            className="w-full sm:w-auto px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-black font-medium text-sm sm:text-base transition shrink-0"
             onClick={openAddModal}
           >
             + Add Team
           </button>
         )}
       </div>
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {teams.map(t => (
           <div
             key={t._id}
-            className="w-full p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-md hover:shadow-xl hover:border-amber-500/30 hover:scale-[1.01] transition duration-300"
+            className="w-full p-4 sm:p-5 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 shadow-md hover:shadow-xl hover:border-amber-500/30 active:scale-[0.99] sm:hover:scale-[1.01] transition duration-300 flex flex-col"
           >
             {isAdmin && (
-              <div className="flex gap-2 justify-end">
+              <div className="flex gap-2 justify-end flex-wrap">
                 <button
                   type="button"
-                  className="text-sm px-3 py-1 rounded-md bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
+                  className="text-xs sm:text-sm px-3 py-1.5 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition"
                   onClick={() => openEditModal(t)}
                 >
                   Edit
                 </button>
                 <button
                   type="button"
-                  className="text-sm px-3 py-1 rounded-md bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
+                  className="text-xs sm:text-sm px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition"
                   onClick={() => handleDelete(t)}
                 >
                   Delete
                 </button>
               </div>
             )}
-            <Link to={`/teams/${t._id}`} className="flex items-center justify-between gap-4 mt-3">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-gray-800 flex items-center justify-center border border-white/10 shadow-sm overflow-hidden">
+            <Link to={`/teams/${t._id}`} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mt-2 sm:mt-3 w-full min-w-0">
+              <div className="flex items-center gap-3 w-full min-w-0">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-xl bg-gray-800 flex items-center justify-center border border-white/10 shadow-md overflow-hidden">
                 {(t.logo || KNOWN_TEAM_LOGOS[(t.name || '').toLowerCase()] || KNOWN_TEAM_LOGOS[(t.shortName || '').toLowerCase()]) ? (
                   <img
                     src={t.logo || KNOWN_TEAM_LOGOS[(t.name || '').toLowerCase()] || KNOWN_TEAM_LOGOS[(t.shortName || '').toLowerCase()]}
@@ -128,15 +129,15 @@ export default function Teams() {
                   </div>
                 )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-lg font-semibold text-gray-100 truncate break-words">{t.name}</div>
-                  <div className="mt-1 flex flex-wrap gap-3 text-sm text-gray-300">
-                    <span>Matches: {t.matchesPlayed}</span>
-                    <span>Won: {t.matchesWon}</span>
-                    <span>Lost: {t.matchesLost}</span>
-                    <span>Runs: {t.totalRuns}</span>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <div className="text-base sm:text-lg font-bold text-gray-100 truncate break-words">{t.name}</div>
+                  <div className="mt-1 text-xs sm:text-sm text-gray-400 font-medium">Players: {t.players}/11</div>
+                  <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs sm:text-sm text-gray-300">
+                    <span>M: {t.matchesPlayed}</span>
+                    <span>W: {t.matchesWon}</span>
+                    <span>L: {t.matchesLost}</span>
+                    <span>R: {t.totalRuns}</span>
                   </div>
-                  <div className="text-sm text-gray-400 mt-1">Players: {t.players}/11</div>
                 </div>
               </div>
             </Link>
@@ -144,9 +145,9 @@ export default function Teams() {
         ))}
       </div>
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="card w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">{editingTeamId ? 'Edit Team' : 'Add Team'}</h3>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="card w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl shadow-md my-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{editingTeamId ? 'Edit Team' : 'Add Team'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="form-label">Team Name</label>
@@ -160,9 +161,9 @@ export default function Teams() {
                 <label className="form-label">Logo URL (optional)</label>
                 <input className="form-input" value={form.logo} onChange={e => setForm(f => ({ ...f, logo: e.target.value }))} placeholder="https://.../team-logo.png" />
               </div>
-              <div className="flex gap-2">
-                <button type="button" className="btn btn-ghost" onClick={() => { setShowModal(false); setEditingTeamId(''); }}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : (editingTeamId ? 'Update' : 'Create')}</button>
+              <div className="flex flex-col-reverse sm:flex-row gap-2">
+                <button type="button" className="btn btn-ghost w-full sm:w-auto rounded-lg px-4 py-2" onClick={() => { setShowModal(false); setEditingTeamId(''); }}>Cancel</button>
+                <button type="submit" className="btn btn-primary w-full sm:w-auto rounded-lg px-4 py-2" disabled={saving}>{saving ? 'Saving...' : (editingTeamId ? 'Update' : 'Create')}</button>
               </div>
             </form>
           </div>
